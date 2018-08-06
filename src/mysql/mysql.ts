@@ -8,7 +8,12 @@ export default class Mysql {
 
   constructor() {
     console.log("Inicializando conectividad Mysql");
-    this.cnn = mysql.createConnection({});
+    this.cnn = mysql.createConnection({
+      host: "localhost",
+      user: "node_user",
+      password: "a123456",
+      database: "heroesdb"
+    });
     this.conectDb();
   }
   private conectDb() {
@@ -20,5 +25,22 @@ export default class Mysql {
       this.connected = true;
       console.log("DataBase Online!!");
     });
+  }
+
+  static executeQuery(query: string, callback: Function) {
+    this.instance.cnn.query(query, (err, results: Object[], fields) => {
+      if (err) {
+        console.log("error en el query");
+        return callback(err);
+      }
+      if (results.length === 0) {
+        callback("Registro solicitado no existe");
+      }
+      callback(null, results);
+    });
+  }
+
+  public static get instance() {
+    return this._instance || (this._instance = new this());
   }
 }
